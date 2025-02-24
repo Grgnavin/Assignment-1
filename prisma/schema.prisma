@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Staff {
+  id       String    @id @default(uuid())
+  username String    @unique
+  password String
+  bookings Booking[]
+}
+
+model Customer {
+  id              String    @id @default(uuid())
+  firstName       String
+  surname         String
+  address        String
+  age            Int
+  drivingLicense Boolean
+  bookings       Booking[]
+}
+
+model Car {
+  id       String    @id @default(uuid())
+  type     CarType
+  fuel     FuelType
+  status   CarStatus @default(AVAILABLE)
+  bookings Booking[]
+}
+
+model Booking {
+  id              String   @id @default(uuid())
+  startDate       DateTime
+  numberOfDays    Int
+  totalPrice      Float
+  unlimitedMileage Boolean @default(false)
+  damageInsurance  Boolean @default(false)
+  customer        Customer @relation(fields: [customerId], references: [id])
+  customerId      String
+  car             Car      @relation(fields: [carId], references: [id])
+  carId           String
+  staff           Staff    @relation(fields: [staffId], references: [id])
+  staffId         String
+  createdAt       DateTime @default(now())
+}
+
+enum CarType {
+  CITY
+  FAMILY
+  SPORTS
+  SUV
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+}
+
+enum CarStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+}
